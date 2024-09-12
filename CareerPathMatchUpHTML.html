@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Career Path Match-Up Game</title>
+    <style>
+        /* CSS Styles */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            text-align: center;
+            padding: 20px;
+        }
+
+        header {
+            margin-bottom: 20px;
+        }
+
+        #gameBoard {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        #path {
+            display: flex;
+            flex-wrap: wrap;
+            width: 80%;
+            margin: 0 auto;
+            border: 2px solid #ccc;
+            padding: 20px;
+            background-color: #fff;
+        }
+
+        .path-step {
+            width: 100px;
+            height: 100px;
+            border: 1px solid #aaa;
+            margin: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            background-color: #e0e0e0;
+        }
+
+        #scenario {
+            margin-top: 20px;
+            padding: 20px;
+            border: 2px solid #aaa;
+            background-color: #fff;
+            width: 60%;
+            text-align: left;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 18px;
+            cursor: pointer;
+            margin: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Career Path Match-Up: The Interactive Game</h1>
+            <p>Match careers with the appropriate education, skills, and job tasks to move forward on your career path journey.</p>
+            <button id="startGame">Start Game</button>
+        </header>
+        
+        <main id="gameBoard" style="display:none;">
+            <div id="path">
+                <!-- The game path will be dynamically created here -->
+            </div>
+            <div id="scenario" class="scenario-box" style="display:none;">
+                <!-- Pop-up scenarios will appear here -->
+                <p id="scenarioText"></p>
+            </div>
+        </main>
+
+        <footer>
+            <p>Develop decision-making, teamwork, and career planning skills with this fun and educational game!</p>
+        </footer>
+    </div>
+
+    <script>
+        // JavaScript Code
+        document.addEventListener('DOMContentLoaded', function() { // Ensure the DOM is fully loaded
+            const startButton = document.getElementById("startGame");
+            if (startButton) {
+                startButton.addEventListener("click", startGame);
+            }
+        });
+
+        let currentStepIndex = 0;
+        const teams = [{ name: "Team A", points: 0 }, { name: "Team B", points: 0 }];
+        let currentTeam = 0;
+
+        function startGame() {
+            document.getElementById("gameBoard").style.display = "block";
+            document.getElementById("startGame").style.display = "none";
+            createGamePath();
+            displayScenario(currentStepIndex);
+        }
+
+        const pathSteps = [
+            { text: "Start", scenario: null },
+            { text: "High School", scenario: "You graduated high school. Do you: (A) Go to college (B) Start working", choices: ["Go to college", "Start working"], correctChoice: 0 },
+            { text: "College", scenario: "You chose college. What major do you pick? (A) Biology (B) Business", choices: ["Biology", "Business"], correctChoice: 0 },
+            { text: "Skills Training", scenario: "You decided to get additional skills training. Choose a skill to focus on. (A) Animal Care (B) IT Support", choices: ["Animal Care", "IT Support"], correctChoice: 0 },
+            { text: "Job Search", scenario: "You are ready to find a job. What is your career goal? (A) Veterinarian (B) IT Technician", choices: ["Veterinarian", "IT Technician"], correctChoice: 0 },
+            { text: "Veterinarian", scenario: "You want to become a veterinarian; what educational path do you choose next? (A) Veterinary School (B) Work Experience", choices: ["Veterinary School", "Work Experience"], correctChoice: 0 },
+            { text: "End", scenario: null }
+        ];
+
+        function createGamePath() {
+            const pathContainer = document.getElementById("path");
+            pathContainer.innerHTML = ''; // Clear existing path elements if any
+            pathSteps.forEach((step, index) => {
+                const stepDiv = document.createElement("div");
+                stepDiv.classList.add("path-step");
+                stepDiv.textContent = step.text;
+                stepDiv.addEventListener("click", () => handleStepClick(index));
+                pathContainer.appendChild(stepDiv);
+            });
+        }
+
+        function handleStepClick(index) {
+            currentStepIndex = index;
+            displayScenario(currentStepIndex);
+        }
+
+        function displayScenario(stepIndex) {
+            const scenarioContainer = document.getElementById("scenario");
+            scenarioContainer.innerHTML = ''; // Clear previous content
+            const scenarioText = document.createElement("p"); // Dynamically create scenario text element
+            const currentStep = pathSteps[stepIndex];
+
+            if (currentStep.scenario) {
+                scenarioContainer.style.display = "block";
+                scenarioText.textContent = currentStep.scenario;
+                scenarioContainer.appendChild(scenarioText);
+                displayChoices(currentStep.choices, currentStep.correctChoice);
+            } else {
+                scenarioContainer.style.display = "none";
+            }
+        }
+
+        function displayChoices(choices, correctChoiceIndex) {
+            const scenarioContainer = document.getElementById("scenario");
+            choices.forEach((choice, index) => {
+                const button = document.createElement("button");
+                button.textContent = choice;
+                button.onclick = () => handleChoice(index, correctChoiceIndex);
+                scenarioContainer.appendChild(button);
+            });
+        }
+
+        function handleChoice(selectedChoiceIndex, correctChoiceIndex) {
+            const scenarioContainer = document.getElementById("scenario");
+            scenarioContainer.innerHTML = ''; // Clear choices for the next step
+
+            if (selectedChoiceIndex === correctChoiceIndex) {
+                teams[currentTeam].points += 10;
+                alert(`Correct! ${teams[currentTeam].name} earns 10 points!`);
+            } else {
